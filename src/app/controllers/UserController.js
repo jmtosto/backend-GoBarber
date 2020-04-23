@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import * as Yup from 'yup';
 import User from '../models/User';
 
@@ -55,9 +56,11 @@ class UserController {
     const user = await User.findByPk(req.userId);
 
     if (email && email !== user.email) {
-      const userExists = await User.findOne({
-        where: { email },
-      });
+      const userExists = await User.findOne({ where: { email } });
+
+      if (userExists) {
+        return res.status(400).json({ error: 'User already exists' });
+      }
     }
 
     if (oldPassword && !(await user.checkPassword(oldPassword))) {
